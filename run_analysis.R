@@ -1,17 +1,13 @@
-clean_data = function (readSource=1) {
-
-require("plyr")
+read_sourcefile = function () {
 
 # Define source file, destination zip file name and directory and the the final csv result file 
 
 sourcefile = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 destzipfile = "./sourcedata/getdata-projectfiles-UCI HAR Dataset.zip"
 destDirectory = "./sourcedata/UCI HAR Dataset/"
-resultcsvfile = "Tidy_data.csv"
+resultcsvfile = "Tidy_data.txt"
 
-# Read source file and unzip it if readSource parameter value is 1
-
-if (readSource==1) {
+# Read source file and unzip it
 
 writeLines("Reading source zip file")
 
@@ -21,19 +17,14 @@ if (!file.exists("sourcedata")) {
 
 if (!file.exists(destzipfile)){
       download.file(sourcefile, destfile=destzipfile, mode="wb")
-      unzip(destzipfile, exdir="./sourcedata")
+      
 }
 
-} else {
- 
-writeLines(paste("Reading already downloaded data from", destDirectory))
-
-if (!file.exists(destDirectory)) {
-      writeLines(paste("Directory not found, load data with clean_data(readSource=1)"))
-      return(FALSE)
-}
+unzip(destzipfile, exdir="./sourcedata")
 
 }
+
+transform_data = function () {
 
 
 # read features and activity labels
@@ -52,7 +43,7 @@ writeLines(paste("training set rows", dim(train_set)[1], "columns", dim(train_se
 
 
 tidy_set = rbind(test_set, train_set)
-writeLines(paste("tidy set rows", dim(tidy_set)[1], "columns", dim(tidy_set)[2]))
+writeLines(paste("initial tidy set rows", dim(tidy_set)[1], "columns", dim(tidy_set)[2]))
 
 
 test_activity = read.table(paste(destDirectory, "test/Y_test.txt", sep=""))
@@ -68,8 +59,14 @@ writeLines(paste("subject activity rows", dim(subject_activity)[1], "columns", d
 
 # create final Subject, Activity columns to tidy set
 
-tidy_set = cbind(tidy_set, merge(subject_activity, activity_labels, by.x="V1", by.y="ActivityId")[,2], sort=F)
-colnames(tidy_set) = c("Subject", "Activity" )
+colnames(tidy_set) = c("Subject")
+colnames(subject_activity)=c("Activity")
+subject_activity$Activity = factor(subject_activity$Activity, levels = activity_labels$ActivityId, labels=activity_labels$Activity)
+
+tidy_set = cbind(tidy_set, subject_activity)
+
+writeLines(paste("tidy set after combining activities rows", dim(tidy_set)[1], "columns", dim(tidy_set)[2]))
+
 
 test_feature_readings = read.table(paste(destDirectory, "test/X_test.txt", sep=""))
 writeLines(paste("test feature readings rows", dim(test_feature_readings)[1], "columns", dim(test_feature_readings)[2]))
@@ -108,10 +105,18 @@ colnames(tidy_set)  =  gsub('\\.std', ".StandardDeviation", colnames(tidy_set))
 colnames(tidy_set)  =  gsub('Freq\\.', "Frequency.", colnames(tidy_set))
 colnames(tidy_set)  =  gsub('Freq$', "Frequency", colnames(tidy_set))
 
+writeLines(paste("Transformation ready, run create_finaldata() next"))
+
+}
+
+create_finaldata = function () {
+
 # create the final set averaging measurements for each subject, activity pair
 
 avg_tidy_set = ddply(tidy_set, c("Subject","Activity"), numcolwise(mean))
 avg_tidy_set = avg_tidy_set[order(avg_tidy_set$Subject),]
+writeLines(paste("final tidy set rows", dim(avg_tidy_set)[1], "columns", dim(avg_tidy_set)[2]))
+
 
 # write the average result set to file
 
@@ -120,11 +125,12 @@ if (!file.exists(resultcsvfile)) {
   resultcsvfile = newfile
 }
         
-write.csv(avg_tidy_set, resultcsvfile, row.names=FALSE)
+write.table(avg_tidy_set, resultcsvfile, row.names=FALSE)
 
 writeLines(paste("Tidy data set is in the ", resultcsvfile, " file in the working directory ", getwd(), sep=""))
 
-return(TRUE)
-
 }
+
+
+
 
