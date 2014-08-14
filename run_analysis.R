@@ -22,6 +22,9 @@ if (!file.exists(destzipfile)){
 
 unzip(destzipfile, exdir="./sourcedata")
 
+writeLines(paste("Source file unzipped in", destDirectory))
+
+
 }
 
 transform_data = function () {
@@ -119,11 +122,6 @@ writeLines(paste("final tidy set rows", dim(avg_tidy_set)[1], "columns", dim(avg
 
 
 # write the average result set to file
-
-if (!file.exists(resultcsvfile)) {
-  newfile = readline(paste("Result file ", resultcsvfile, " already exists in the working directory, give new name for this version of result file "))
-  resultcsvfile = newfile
-}
         
 write.table(avg_tidy_set, resultcsvfile, row.names=FALSE)
 
