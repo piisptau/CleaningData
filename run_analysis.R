@@ -39,7 +39,7 @@ features = read.table(paste(destDirectory, "features.txt", sep=""), stringsAsFac
 writeLines(paste("features rows", dim(features)[1], "columns", dim(features)[2]))
 
 activity_labels = read.table(paste(destDirectory, "activity_labels.txt", sep=""), stringsAsFactors=FALSE, col.names = c("ActivityId", "Activity"))
-# activity_labels[,2] =c("Walking","Walking upstairs","Walking downstairs","Sitting","Standing","Laying") 
+activity_labels[,2] =c("Walking","Walking upstairs","Walking downstairs","Sitting","Standing","Laying") 
 writeLines(paste("activities rows", dim(activity_labels)[1], "columns", dim(activity_labels)[2]))
 
 test_set = read.table(paste(destDirectory, "test/subject_test.txt", sep=""))
