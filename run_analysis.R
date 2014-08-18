@@ -1,4 +1,4 @@
-read_sourcefile = function () {
+library(plyr)
 
 # Define source file, destination zip file name and directory and the the final csv result file 
 
@@ -6,6 +6,9 @@ sourcefile = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI
 destzipfile = "./sourcedata/getdata-projectfiles-UCI HAR Dataset.zip"
 destDirectory = "./sourcedata/UCI HAR Dataset/"
 resultcsvfile = "Tidy_data.txt"
+tidy_set = data.frame()
+
+read_sourcefile = function () {
 
 # Read source file and unzip it
 
@@ -36,6 +39,7 @@ features = read.table(paste(destDirectory, "features.txt", sep=""), stringsAsFac
 writeLines(paste("features rows", dim(features)[1], "columns", dim(features)[2]))
 
 activity_labels = read.table(paste(destDirectory, "activity_labels.txt", sep=""), stringsAsFactors=FALSE, col.names = c("ActivityId", "Activity"))
+# activity_labels[,2] =c("Walking","Walking upstairs","Walking downstairs","Sitting","Standing","Laying") 
 writeLines(paste("activities rows", dim(activity_labels)[1], "columns", dim(activity_labels)[2]))
 
 test_set = read.table(paste(destDirectory, "test/subject_test.txt", sep=""))
@@ -107,6 +111,8 @@ colnames(tidy_set)  =  gsub('\\.mean', ".Mean", colnames(tidy_set))
 colnames(tidy_set)  =  gsub('\\.std', ".StandardDeviation", colnames(tidy_set))
 colnames(tidy_set)  =  gsub('Freq\\.', "Frequency.", colnames(tidy_set))
 colnames(tidy_set)  =  gsub('Freq$', "Frequency", colnames(tidy_set))
+
+assign('tidy_set',tidy_set,envir=.GlobalEnv)
 
 writeLines(paste("Transformation ready, run create_finaldata() next"))
 
