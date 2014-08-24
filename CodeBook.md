@@ -24,6 +24,10 @@ The measurement data is normalized and has values between [-1,1].
 
 Only those measurement columns that were related to mean or standard deviation were included. The columns were selected based on the column name. If the column name had string 'mean' or 'std' as part of the name then it was concluded that the column contains mean or standard deviation measurement data and it was included in the final set.
 
+Column names were made more user-friendly by
+* replacing abbreviations with full names Acc->Acceleration, Mag->Magnitude, Freq->Frequency, std->StandardDeviation
+* changing column names to syntactically valid names by using the function make.names
+
 ### Data columns in the final data set
 * Subject the subject for whom the data was collected
 * Activity the name of activity
